@@ -67,6 +67,7 @@ supported architectures:
   ARM64 [ARM64]
   PowerPC [PPC, PPC64]
   SPARC [SPARC64]
+  RISCV [RISCV64C]
 
 available rop chain generators:
   execve (execve[=<cmd>], default /bin/sh) [Linux x86, x86_64]

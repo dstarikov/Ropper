@@ -517,7 +517,55 @@ class ArchitectureSPARC64(ArchitectureSPARC):
             (byte_regexp(0b11000001, 0b10000001) + b'[\xc0-\xc7][\x00-\xff][\x00-\xff]', 4)] # jmpl (ret, retl)
         self._endings[gadget.GadgetType.SYS] = [(b'\x91\xd0\x20\x6d', 4)] # ta 0x6d
 
+class ArchitectureRISCV(Architecture):
+    def __init__(self):
+        super(ArchitectureRISCV, self).__init__(CS_ARCH_RISCV, CS_MODE_RISCV32, 4, 2, endianess=Endianess.LITTLE)
+        self._name = 'RISCV'
 
+    def _initGadgets(self):
+        super(ArchitectureRISCV, self)._initGadgets()
+        self._endings[gadget.GadgetType.ROP] = []
+        self._endings[gadget.GadgetType.JOP] = []
+        #  self._endings[gadget.GadgetType.SYS] = []
+
+class ArchitectureRISCV64(ArchitectureRISCV):
+
+    #  def __init__(self, arch, mode, addressLength, align, endianess=Endianess.LITTLE, branch_delay_slot=False):
+        #  super(Architecture, self).__init__()
+
+    def __init__(self):
+
+        Architecture.__init__(self, CS_ARCH_RISCV, CS_MODE_RISCV64, 8, 8)
+        self._name = 'RISCV64'
+
+    def _initGadgets(self):
+        super(ArchitectureRISCV, self)._initGadgets()
+
+        #  self._endings[gadget.GadgetType.ROP] = [
+            #  (byte_regexp(0b11000001, 0b10000001) + b'[\xc8-\xcf][\x00-\xff][\x00-\xff]', 4), # return
+            #  (byte_regexp(0b11000001, 0b10000001) + b'[\xe8-\xef][\x00-\xff][\x00-\xff]', 4)] # restore
+        #  self._endings[gadget.GadgetType.JOP] = [
+            #  (byte_regexp(0b11000001, 0b10000001) + b'[\xc0-\xc7][\x00-\xff][\x00-\xff]', 4)] # jmpl (ret, retl)
+        #  self._endings[gadget.GadgetType.SYS] = [(b'\x91\xd0\x20\x6d', 4)] # ta 0x6d
+
+class ArchitectureRISCV64C(ArchitectureRISCV):
+
+    #  def __init__(self, arch, mode, addressLength, align, endianess=Endianess.LITTLE, branch_delay_slot=False):
+        #  super(Architecture, self).__init__()
+
+    def __init__(self):
+
+        Architecture.__init__(self, CS_ARCH_RISCV, CS_MODE_RISCVC + CS_MODE_RISCV64, 8, 2)
+        self._name = 'RISCV64C'
+
+    def _initGadgets(self):
+        super(ArchitectureRISCV, self)._initGadgets()
+        self._endings[gadget.GadgetType.ROP] = [
+                (b'\x80\x82', 2) # ret
+        ]
+        self._endings[gadget.GadgetType.JOP] = [
+                (byte_regexp(0b01111111, 0b00000010) + byte_regexp(0b11100000, 0b10000000), 2), # c.jr and c.jalr
+        ]
 
 x86 = ArchitectureX86()
 x86_64 = ArchitectureX86_64()
@@ -532,6 +580,8 @@ ARM64 = ArchitectureArm64()
 PPC = ArchitecturePPC()
 PPC64 = ArchitecturePPC64()
 SPARC64 = ArchitectureSPARC64()
+RISCV64 = ArchitectureRISCV64()
+RISCV64C = ArchitectureRISCV64C()
 
 def getArchitecture(archString):
     arch = globals().get(archString, None)
